@@ -1,2 +1,2 @@
 # SocketCmd
-Use cmd by socket
+Работа с консолью через socket
