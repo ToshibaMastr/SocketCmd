@@ -8,13 +8,19 @@ class BestSocket():
     _thr = None
 
     def __init__(self, HOST:int, PORT:str, type:str):
-        self.conn = socket.socket()
         if type=='server':
-            self.conn.bind((HOST, PORT))
-            self.conn.listen(50)
-            #self.conn, addr = self.conn.accept()
+            self.socket = socket.socket()
+            self.socket.bind((HOST, PORT))
+            self.socket.listen(50)
         elif type=='client':
-            self.conn.connect((HOST, PORT))
+            self.conn = socket.socket()
+            while True:
+                try:
+                    self.conn.connect((HOST, PORT))
+                except:
+                    pass
+                else:
+                    break
 
     def sendFile(self, file:str):
         """Загружает файл через соединение"""
@@ -56,9 +62,9 @@ class BestSocket():
         while not self._thr or not self._thr.is_alive():
             if self._thr:
                 self.conns.append(self._thr.join())
-            self._thr = StdThread(target=self.conn.accept)
-            self._thr.start()
             time.sleep(0.5)
+            self._thr = StdThread(target=self.socket.accept)
+            self._thr.start()
         return [conn[1] for conn in self.conns]
 
     def setConn(self, num:int):
@@ -68,7 +74,7 @@ class BestSocket():
     def closeConns(self):
         """Закрывает подключения"""
         for conn in self.conns:
-            conn.close()#+
+            conn.close()
     
     def close(self):
         """Закрывает подключение"""

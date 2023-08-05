@@ -74,7 +74,7 @@ class BestSocket():
     def closeConns(self):
         """Закрывает подключения"""
         for conn in self.conns:
-            conn.close()#+
+            conn.close()
     
     def close(self):
         """Закрывает подключение"""

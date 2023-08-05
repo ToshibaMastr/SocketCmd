@@ -1,6 +1,5 @@
 from subprocess import PIPE, Popen, CREATE_NO_WINDOW
 import time
-import sys
 from bestSocket import *
 from bCCmd import *
 

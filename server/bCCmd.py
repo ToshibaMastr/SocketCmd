@@ -4,7 +4,7 @@ class BCCmd:
 
     def read(self) -> bytes:
         """Чтение команды"""
-        data = bytes(input('\033[1m'),'UTF-8')
+        data = input('\033[1m').encode('cp866')
         print('', end='\033[0m')
         return data
     
