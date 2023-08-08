@@ -17,10 +17,10 @@ class BestSocket():
             while True:
                 try:
                     self.conn.connect((HOST, PORT))
+                    if self.conn.recv(1)==b'T':
+                        break
                 except:
                     pass
-                else:
-                    break
 
     def sendFile(self, file:str):
         """Загружает файл через соединение"""
@@ -61,7 +61,9 @@ class BestSocket():
         """Находит подключения, возвращает ip подключений"""
         while not self._thr or not self._thr.is_alive():
             if self._thr:
-                self.conns.append(self._thr.join())
+                newConn = self._thr.join()
+                newConn[0].send(b'T')
+                self.conns.append(newConn)
             time.sleep(0.5)
             self._thr = StdThread(target=self.socket.accept)
             self._thr.start()

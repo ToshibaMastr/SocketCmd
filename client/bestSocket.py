@@ -8,19 +8,19 @@ class BestSocket():
     _thr = None
 
     def __init__(self, HOST:int, PORT:str, type:str):
-        self.conn = socket.socket()
         if type=='server':
-            self.conn.bind((HOST, PORT))
-            self.conn.listen(50)
+            self.socket = socket.socket()
+            self.socket.bind((HOST, PORT))
+            self.socket.listen(50)
         elif type=='client':
+            self.conn = socket.socket()
             while True:
                 try:
                     self.conn.connect((HOST, PORT))
+                    if self.conn.recv(1)==b'T':
+                        break
                 except:
                     pass
-                else:
-                    break
-                
 
     def sendFile(self, file:str):
         """Загружает файл через соединение"""
@@ -55,16 +55,18 @@ class BestSocket():
     def recvMsg(self):
         """Получает сообщение из соединения"""
         rawMsg = self.recv()
-        return rawMsg[0], rawMsg[2:]
+        return rawMsg[:2], rawMsg[2:]
 
     def findConns(self) -> list:
         """Находит подключения, возвращает ip подключений"""
         while not self._thr or not self._thr.is_alive():
             if self._thr:
-                self.conns.append(self._thr.join())
-            self._thr = StdThread(target=self.conn.accept)
-            self._thr.start()
+                newConn = self._thr.join()
+                newConn[0].send(b'T')
+                self.conns.append(newConn)
             time.sleep(0.5)
+            self._thr = StdThread(target=self.socket.accept)
+            self._thr.start()
         return [conn[1] for conn in self.conns]
 
     def setConn(self, num:int):

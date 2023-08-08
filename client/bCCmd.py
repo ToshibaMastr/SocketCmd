@@ -15,7 +15,7 @@ class BCCmd:
         time.sleep(2.017)
         
     def send(self, c:str):
-        self.process.stdin.write(c + b'\n')
+        self.process.stdin.write(c)
     
     def flush(self):
         self.process.stdin.flush()
@@ -55,14 +55,13 @@ class BCCmd:
             text = text + thread.join()
             thread = StdThread(target=process.read, args=(1, ))
             thread.start()
-            #time.sleep(0.001)
         return text, thread
 
 def argsSplit(c:str) -> list:
     """Преобразует строку в массив"""
     s, j = True, b''
     args = []
-    for i in c:
+    for i in c[:-1]:
         if s and i==32:
             args.append(j)
             j=b''

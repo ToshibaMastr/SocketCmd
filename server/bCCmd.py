@@ -7,7 +7,7 @@ class BCCmd:
     
     def write(self, string:bytes):
         """Вывод текста из CMD"""
-        print(str(string, encoding='cp866'), end='')
+        print(string.decode('cp866'), end='')
     
     def findConns(self):
         """Поиск подключений"""
@@ -15,7 +15,7 @@ class BCCmd:
 
     def connections(self, conns:list):
         """Вывод всех соединений"""
-        st = '\033[92m' + '→ connections '
+        st = '\033[92m→\033[32m connections \033[92m'
         for conn in conns:
             st += f'{conn[0]}:{str(conn[1])}, '
         else:
@@ -24,7 +24,7 @@ class BCCmd:
 
     def connectTo(self, host:str, port:int, num:int):
         """Вывод 'соединения к порту'"""
-        print('\033[92m' + f'↓ Connect to {host}:{port} ({num})', end = '\033[0m\n')
+        print('\033[92m↓\033[32m Connect to \033[92m' + f'{host}:{port} ({num})', end = '\033[0m\n')
     
     def newLine(self, lines=1):
         """Переход на следующую строку"""
