@@ -30,16 +30,14 @@ while True:
         case b'|E':
             bc.error(text)
         case b'_ ':
-            ast = bc.read()
-            if ast[0] == 47:
-                args = argsSplit(ast[1:])
-                try:
+            com = bc.read()
+            if com and com[0] == 47:
+                args = argsSplit(com[1:])
+
+                if args[0] in commands:
                     commands[args[0]].use(bc, bs, args)
-                except KeyError:
+                else:
                     bc.error(f'Команда /{args[0]} не найдена, используйте /help для получения полного списка команд.\n')
                 bs.send(b'\n')
             else:
-                bs.send(ast+b'\n')
-#/lfile c:\Users\ggost\Downloads\pgs.png hell.png
-#/lfile c:\Users\ggost\Downloads\th.jpg car.jpg
-#/lfile cc.txt vv.txt
+                bs.send(com+b'\n')

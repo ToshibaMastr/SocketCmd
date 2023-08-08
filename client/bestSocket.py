@@ -13,14 +13,11 @@ class BestSocket():
             self.socket.bind((HOST, PORT))
             self.socket.listen(50)
         elif type=='client':
-            self.conn = socket.socket()
             while True:
-                try:
-                    self.conn.connect((HOST, PORT))
-                    if self.conn.recv(1)==b'T':
-                        break
-                except:
-                    pass
+                self.conn = socket.socket()
+                self.conn.connect((HOST, PORT))
+                if self.conn.recv(1)==b'T':
+                    break
 
     def sendFile(self, file:str):
         """Загружает файл через соединение"""

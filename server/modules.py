@@ -87,8 +87,9 @@ class setconn(command):
     def use(self, bc, bs, args):
         if len(args)==len(self.inputs)+1:
             bc.info(f'Соединение.\n')
-            conns = bs.findConns()
-            bc.connections(conns)
+            num = int(args[1])
+            bs.setConn(num)
+            bc.connectTo(*bs.conns[num][1], num)
         else:
             bc.error(f'Неверный синтаксис команды.\n')
 
