@@ -58,16 +58,16 @@ class BCCmd:
         return text, thread
 
 def argsSplit(c:str) -> list:
-    """Преобразует строку в массив"""
-    s, j = True, b''
+    """Преобразует строку в массив."""
+    s, j = True, ''
     args = []
-    for i in c[:-1]:
-        if s and i==32:
+    for i in c.decode('cp866'):
+        if s and i==' ':
             args.append(j)
-            j=b''
-        elif i==34:
+            j=''
+        elif i=='"':
             s = not s
         else:
-            j += i.to_bytes()
+            j += i
     args.append(j)
     return args

@@ -32,8 +32,10 @@ class BestSocket():
                     self.send(b'00')
                     yield 'Ok!'
                 self.send(rawFile)
-                if self.recv()!=b'2017':
+                recvcode = self.recv()
+                if recvcode!=b'2017':
                     yield 'Wrong!'
+                    return
                 recived+=1
                 yield str(recived)
 

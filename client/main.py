@@ -1,6 +1,7 @@
 import time
 from bestSocket import *
 from bCCmd import *
+from modules import *
 
 URL = '127.0.0.1'
 PORT = 9090
@@ -22,17 +23,10 @@ while 1:
             if not rawdata:
                 break
             elif rawdata[0] == 47:
-                asp = argsSplit(rawdata[1:])
-          
-                match asp[0].lower():
-                    case b'lfile':
-                        for i in bs.recvFile(asp[1]):
-                            if i=='Ok!' or i=='Wrong!':
-                                break
-                    case b'sfile':
-                        for i in bs.sendFile(asp[1]):
-                            if i=='Ok!' or i=='Wrong!':
-                                break
+                args = argsSplit(rawdata[1:-1])
+
+                if args[0] in commands:
+                    commands[args[0]].use(bs, args)
             else:
                 prefix = rawdata
                 bc.send(rawdata)

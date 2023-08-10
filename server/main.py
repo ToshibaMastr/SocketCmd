@@ -25,11 +25,11 @@ bc.newLine()
 while True:
     tp, text = bs.recvMsg()
     match tp:
-        case b'|O':
+        case b'|O': # Текстовая информация
             bc.write(text)
-        case b'|E':
+        case b'|E': # Текстовая информация (ошибки)
             bc.error(text)
-        case b'_ ':
+        case b'_ ': # Ждёт ответа сервера
             com = bc.read()
             if com and com[0] == 47:
                 args = argsSplit(com[1:])
@@ -41,3 +41,4 @@ while True:
                 bs.send(b'\n')
             else:
                 bs.send(com+b'\n')
+#/lfile "c:\Users\ggost\Downloads\hq720 (5).webp" web.webp
