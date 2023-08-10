@@ -1,5 +1,2 @@
-start.bat
-client/NBL.py
 client/__pycache__/
 server/__pycache__/
-web.webp
