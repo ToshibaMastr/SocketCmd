@@ -15,7 +15,7 @@ class BCCmd:
 
     def connections(self, conns: list):
         """Вывод всех соединений."""
-        st = '\033[92m→\033[32m connections \033[92m'
+        st = '\033[92m→\033[32m Connections \033[92m'
         for conn in conns:
             st += f'{conn[0]}:{str(conn[1])}, '
         else:
@@ -36,8 +36,8 @@ class BCCmd:
             err = str(err, encoding='cp866')
         print('\033[91m' + err, end='\033[0m')
 
-    def info(self, err):
+    def info(self, info):
         """Отображение информацию."""
-        if type(err) == bytes:
-            err = str(err, encoding='cp866')
-        print('\033[93m' + err, end='\033[0m')
+        if type(info) == bytes:
+            info = str(info, encoding='cp866')
+        print('\033[93m' + info, end='\033[0m')

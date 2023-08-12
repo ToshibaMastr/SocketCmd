@@ -1,0 +1,1 @@
+start py client/main.py | start py server/main.py

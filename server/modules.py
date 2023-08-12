@@ -75,17 +75,21 @@ class _lfile(_command):
         if len(args) == len(self.inputs):
             bc.info(f'Копирую файл (server){args[0]} на (client){args[1]}.\n')
             bs.send('/lfile ' + args[1])
-            for ans in bs.sendFile(args[0]):
-                match ans:
-                    case 'Ok!':
+            recived = 0
+            with open(args[0], 'rb') as f:
+                while True:
+                    rawFile = f.read(1024)
+                    if not rawFile:
+                        bs.send('00')
                         bc.info('Успешно!.\n')
                         break
-                    case 'Wrong':
+                    bs.conn.send(rawFile)
+                    recvcode = bs.recv()
+                    if recvcode != '2017':
                         bc.error('Что-то пошло не так...\n')
                         break
-                    case _:
-                        bc.info(f'{ans}kb' + '\n')
-            bs.recvMsg()
+                    recived += 1
+                    bc.info(f'{recived}kb' + '\n')
         else:
             bc.error('Неверный синтаксис команды.\n')
 
@@ -100,17 +104,18 @@ class _sfile(_command):
         if len(args) == len(self.inputs):
             bc.info(f'Копирую файл (client){args[0]} на (server){args[1]}.\n')
             bs.send('/sfile ' + args[0])
-            for ans in bs.recvFile(args[0]):
-                match ans:
-                    case 'Ok!':
+
+            recived = 0
+            with open(args[1], 'wb') as f:
+                while True:
+                    rFile = bs.conn.recv()
+                    if rFile == b'00':
                         bc.info('Успешно!.\n')
                         break
-                    case 'Wrong':
-                        bc.error('Что-то пошло не так...\n')
-                        break
-                    case _:
-                        bc.info(f'{ans}kb' + '\n')
-            bs.recvMsg()
+                    f.write(rFile)
+                    bs.send('2017')
+                    recived += 1
+                    bc.info(f'{recived}kb' + '\n')
         else:
             bc.error('Неверный синтаксис команды.\n')
 

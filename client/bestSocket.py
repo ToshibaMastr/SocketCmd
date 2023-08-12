@@ -35,38 +35,6 @@ class BestSocket:
         rawMsg = self.recv()
         return rawMsg[:2], rawMsg[2:]
 
-    def sendFile(self, file: str):
-        """Загружает файл через соединение"""
-        recived = 0
-        with open(file, 'rb') as f:
-            while True:
-                rawFile = f.read(1024)
-                if not rawFile:
-                    self.send('00')
-                    yield 'Ok!'
-                    return
-                self.conn.send(rawFile)
-                recvcode = self.recv()
-                if recvcode != '2017':
-                    yield 'Wrong!'
-                    return
-                recived += 1
-                yield str(recived)
-
-    def recvFile(self, file: str):
-        """Сохраняет файл через соединение"""
-        recived = 0
-        with open(file, 'wb') as f:
-            while True:
-                rFile = self.conn.recv()
-                if rFile == b'00':
-                    yield 'Ok!'
-                    return
-                f.write(rFile)
-                self.send('2017')
-                recived += 1
-                yield str(recived)
-
     def findConns(self) -> list:
         """Находит подключения, возвращает ip подключений"""
         while not self._thr or not self._thr.is_alive():

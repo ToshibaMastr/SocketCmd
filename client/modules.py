@@ -6,17 +6,28 @@ class _command:
 class _lfile(_command):
     def use(self, _, bs, args):
         if len(args) == 1:
-            for i in bs.recvFile(args[0]):
-                if i == 'Ok!' or i == 'Wrong!':
-                    break
+            with open(args[0], 'wb') as f:
+                while True:
+                    rFile = bs.conn.recv()
+                    if rFile == b'00':
+                        break
+                    f.write(rFile)
+                    bs.send('2017')
 
 
 class _sfile(_command):
     def use(self, _, bs, args):
         if len(args) == 1:
-            for i in bs.sendFile(args[0]):
-                if i == 'Ok!' or i == 'Wrong!':
-                    break
+            with open(args[0], 'rb') as f:
+                while True:
+                    rawFile = f.read(1024)
+                    if not rawFile:
+                        bs.send('00')
+                        break
+                    bs.conn.send(rawFile)
+                    recvcode = bs.recv()
+                    if recvcode != '2017':
+                        break
 
 
 _commands = {'sfile': _sfile(),
@@ -36,7 +47,6 @@ def argsSplit(commandLine: str) -> list:
         else:
             arg += i
     args.append(arg)
-    print(args)
     return args
 
 
