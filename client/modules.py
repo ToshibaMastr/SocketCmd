@@ -4,7 +4,7 @@ class _command:
 
 
 class _lfile(_command):
-    def use(self, _, bs, args):
+    def use(self, bc, bs, args):
         if len(args) == 1:
             with open(args[0], 'wb') as f:
                 while True:
@@ -16,7 +16,7 @@ class _lfile(_command):
 
 
 class _sfile(_command):
-    def use(self, _, bs, args):
+    def use(self, bc, bs, args):
         if len(args) == 1:
             with open(args[0], 'rb') as f:
                 while True:
@@ -30,8 +30,10 @@ class _sfile(_command):
                         break
 
 
-_commands = {'sfile': _sfile(),
-             'lfile': _lfile()}
+_commands = {
+    'sfile': _sfile(),
+    'lfile': _lfile()
+}
 
 
 def argsSplit(commandLine: str) -> list:

@@ -1,6 +1,6 @@
+from stdThread import StdThread
 import time
 import socket
-from stdThread import StdThread
 
 
 class BestSocket:

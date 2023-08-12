@@ -1,6 +1,6 @@
+from stdThread import StdThread
 from subprocess import PIPE, Popen, CREATE_NO_WINDOW
 import time
-from stdThread import StdThread
 
 
 CLUSTER_SIZE = 128
@@ -8,7 +8,9 @@ CLUSTER_SIZE = 128
 
 class BCCmd:
     def __init__(self):
-        self.process = Popen("cmd /T:f0", stdin=PIPE, stdout=PIPE, stderr=PIPE, creationflags=CREATE_NO_WINDOW)
+        self.process = Popen("cmd /T:f0", stdin=PIPE,
+                             stdout=PIPE, stderr=PIPE,
+                             creationflags=CREATE_NO_WINDOW)
         self.threadOut = StdThread(target=self.process.stdout.read, args=(1, ))
         self.threadErr = StdThread(target=self.process.stderr.read, args=(1, ))
 
@@ -30,10 +32,15 @@ class BCCmd:
 
     def stdall(self, std: str, func, tp: str = b'', prefix=b'') -> (bytes):
         """Возвращяет текст из потока."""
-        thread, process = (self.threadOut, self.process.stdout) if std == 'out' else (self.threadErr, self.process.stderr)
         claster = b''
+
+        if std == 'out':
+            thread, process = (self.threadOut, self.process.stdout)
+        else:
+            thread, process = (self.threadErr, self.process.stderr)
         while not thread.is_alive():
-            text, thread = self._stdall(process, thread, CLUSTER_SIZE-len(claster))
+            text, thread = self._stdall(process, thread,
+                                        CLUSTER_SIZE-len(claster))
             claster += text
             if len(claster) == CLUSTER_SIZE:
                 func(tp + claster.removeprefix(prefix[:CLUSTER_SIZE]))

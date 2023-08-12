@@ -2,7 +2,6 @@ from bestSocket import BestSocket
 from bCCmd import BCCmd
 from modules import execute
 
-#/lfile c:\Users\ggost\Downloads\2267231.jpg 22.jpg
 #Toshiba - лучшая компания, ToshibaMastru - хороший человек)
 print('\033[0m  ______\033[90m____  _____ __  __________  ___ \033[0m   _ _\n /_  __/\033[90m __ \/ ___// / / /  _/ __ )/   |\033[0m  / V \\\n  / /\033[90m / / / /\__ \/ /_/ // // __  / /| |\033[0m  | \033[90mM\033[0m |\n / /\033[90m / /_/ /___/ / __  // // /_/ / ___ |\033[0m  \\   /\n/_/\033[90m  \____//____/_/ /_/___/_____/_/  |_|\033[0m   \\_/\n')
 
@@ -28,7 +27,7 @@ while True:
             case '_ ':  # Ждёт ответа сервера
                 com = bc.read()
                 if com and com[0] == '/':
-                    execute(com[1:], bc, bs)
+                    execute(com[1:], bc, bs, True)
                     bc.newLine()
                 else:
                     bs.send(com+'\n')

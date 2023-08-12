@@ -24,7 +24,7 @@ class _help(_command):
     info = '._.'
     inputs = [['command', 'Команда.']]
 
-    def use(self, bc, bs, args):
+    def use(self, bc, bs, args, nl):
         if len(args) == 0:
             for command in _commands.values():
                 command._about(bc)
@@ -33,6 +33,8 @@ class _help(_command):
                 _commands[args[0]]._help(bc)
             except KeyError:
                 bc.error(f'Команда {args[0]} не найдена.\n')
+        if nl:
+            bs.send('\n')
 
 
 class _findconn(_command):
@@ -40,15 +42,14 @@ class _findconn(_command):
     info = 'Поиск и подключение новых клиентов.'
     inputs = []
 
-    def use(self, bc, bs, args=[]):
-        if len(args) == len(self.inputs):
-            bc.findConns()
-            conns = []
-            while conns == []:
-                conns = bs.findConns()
-            bc.connections(conns)
-        else:
-            bc.error('Неверный синтаксис команды.\n')
+    def use(self, bc, bs, args, nl):
+        bc.findConns()
+        conns = []
+        while conns == []:
+            conns = bs.findConns()
+        bc.connections(conns)
+        if nl:
+            bs.send('\n')
 
 
 class _setconn(_command):
@@ -56,13 +57,12 @@ class _setconn(_command):
     info = 'Соединение с клиентом.'
     inputs = [['num', 'Номер клиента.']]
 
-    def use(self, bc, bs, args):
-        if len(args) == len(self.inputs):
-            num = int(args[0])
-            bs.setConn(num)
-            bc.connectTo(*bs.conns[num].info, num)
-        else:
-            bc.error('Неверный синтаксис команды.\n')
+    def use(self, bc, bs, args, nl):
+        num = int(args[0])
+        bs.setConn(num)
+        bc.connectTo(*bs.conns[num].info, num)
+        if nl:
+            bs.send('\n')
 
 
 class _lfile(_command):
@@ -71,27 +71,24 @@ class _lfile(_command):
     inputs = [['file', 'Копируемый файл на сервере.'],
               ['newFile', 'Новый файл у клиента.']]
 
-    def use(self, bc, bs, args):
-        if len(args) == len(self.inputs):
-            bc.info(f'Копирую файл (server){args[0]} на (client){args[1]}.\n')
-            bs.send('/lfile ' + args[1])
-            recived = 0
-            with open(args[0], 'rb') as f:
-                while True:
-                    rawFile = f.read(1024)
-                    if not rawFile:
-                        bs.send('00')
-                        bc.info('Успешно!.\n')
-                        break
-                    bs.conn.send(rawFile)
-                    recvcode = bs.recv()
-                    if recvcode != '2017':
-                        bc.error('Что-то пошло не так...\n')
-                        break
-                    recived += 1
-                    bc.info(f'{recived}kb' + '\n')
-        else:
-            bc.error('Неверный синтаксис команды.\n')
+    def use(self, bc, bs, args, nl):
+        bc.info(f'Копирую файл (server){args[0]} на (client){args[1]}.\n')
+        bs.send('/lfile ' + args[1])
+        recived = 0
+        with open(args[0], 'rb') as f:
+            while True:
+                rawFile = f.read(1024)
+                if not rawFile:
+                    bs.send('00')
+                    bc.info('Успешно!.\n')
+                    break
+                bs.conn.send(rawFile)
+                recvcode = bs.recv()
+                if recvcode != '2017':
+                    bc.error('Что-то пошло не так...\n')
+                    break
+                recived += 1
+                bc.info(f'{recived}kb' + '\n')
 
 
 class _sfile(_command):
@@ -100,31 +97,30 @@ class _sfile(_command):
     inputs = [['file', 'Копируемый файл клиента.'],
               ['newFile', 'Новый файл на сервере.']]
 
-    def use(self, bc, bs, args):
-        if len(args) == len(self.inputs):
-            bc.info(f'Копирую файл (client){args[0]} на (server){args[1]}.\n')
-            bs.send('/sfile ' + args[0])
+    def use(self, bc, bs, args, nl):
+        bc.info(f'Копирую файл (client){args[0]} на (server){args[1]}.\n')
+        bs.send('/sfile ' + args[0])
 
-            recived = 0
-            with open(args[1], 'wb') as f:
-                while True:
-                    rFile = bs.conn.recv()
-                    if rFile == b'00':
-                        bc.info('Успешно!.\n')
-                        break
-                    f.write(rFile)
-                    bs.send('2017')
-                    recived += 1
-                    bc.info(f'{recived}kb' + '\n')
-        else:
-            bc.error('Неверный синтаксис команды.\n')
+        recived = 0
+        with open(args[1], 'wb') as f:
+            while True:
+                rFile = bs.conn.recv()
+                if rFile == b'00':
+                    bc.info('Успешно!.\n')
+                    break
+                f.write(rFile)
+                bs.send('2017')
+                recived += 1
+                bc.info(f'{recived}kb' + '\n')
 
 
-_commands = {'help': _help(),
-             'lfile': _lfile(),
-             'sfile': _sfile(),
-             'findconn': _findconn(),
-             'setconn': _setconn()}
+_commands = {
+    'help': _help(),
+    'lfile': _lfile(),
+    'sfile': _sfile(),
+    'findconn': _findconn(),
+    'setconn': _setconn()
+}
 
 
 def argsSplit(commandLine: str) -> list:
@@ -143,10 +139,19 @@ def argsSplit(commandLine: str) -> list:
     return args
 
 
-def execute(commandLine: list, bc, bs):
+def execute(commandLine: list, bc, bs, nl=False):
     """Исполняет команду."""
     args = argsSplit(commandLine)
-    if args[0] in _commands:
-        _commands[args[0]].use(bc, bs, args[1:])
-    else:
-        bc.error(f'Команда /{args[0]} не найдена, используйте /help для получения полного списка команд.\n')
+    if not args[0] in _commands:
+        bc.error(f'Команда /{args[0]} не найдена, используйте /help для'
+                 ' получения полного списка команд.\n')
+        if nl:
+            bs.send('\n')
+        return
+    comm = _commands[args[0]]
+    if not len(comm.inputs) == len(args)-1:
+        bc.error('Неверный синтаксис команды.\n')
+        if nl:
+            bs.send('\n')
+        return
+    comm.use(bc, bs, args[1:], nl)

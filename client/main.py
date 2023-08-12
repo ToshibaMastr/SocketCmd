@@ -26,5 +26,5 @@ while 1:
                 prefix = rawdata.encode('cp866')
                 bc.send(rawdata)
             bc.flush()
-    except:
+    except Exception:
         continue
